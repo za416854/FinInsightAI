@@ -147,7 +147,7 @@ Source: Docker grabs the code and Dockerfile from your local computer folder.
 - Login: You run aws configure on EC2 and input Access Key. 
     - Purpose: This step is to give EC2 'entry permission' so it has the authority to pull your private Image from the ECR repository.
 - Create RDS: Launch a PostgreSQL instance in AWS Console and note the Endpoint.
-
+    - 500 Error: This means your Port 80 is open, the request has successfully reached the .NET program, but an error occurred during execution (usually database connection or missing table).
 3. Database Initialization (Database Schema & Data)
 - Connection: Connect from local pgAdmin to cloud RDS via Endpoint. 
 - Initialization: Run init.sql to create the loans table and insert test data (Li Ahua, Zhang Xiaoming). 
