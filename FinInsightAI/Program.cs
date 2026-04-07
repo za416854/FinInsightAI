@@ -19,7 +19,7 @@ if (app.Environment.IsDevelopment())
 
 
 // --- 3. 建立 AI 問答 Endpoint ---
-app.MapGet("/ask", async (string prompt, GeminiService gemini) =>
+app.MapGet("/ask", async (string prompt, GeminiService gemini, IConfiguration configuration) =>
 {
     // 1. AI 生成 SQL
     var rawSql = await gemini.GenerateSql(prompt);
@@ -27,8 +27,8 @@ app.MapGet("/ask", async (string prompt, GeminiService gemini) =>
     // 2. 關鍵修正：清理掉可能存在的 Markdown 標籤與換行
     // 這行會去掉 ```sql, ``` 以及前後空白
     var sql = rawSql.Replace("```sql", "").Replace("```", "").Trim();
-
-    string connString = "Host=localhost;Port=5432;Username=myuser;Password=mypassword;Database=FinInsightDb";
+     
+    string connString = configuration["ConnectionStrings:FinInsightDb"] ?? throw new ArgumentNullException("找不到資料庫連線字串設定！");
 
     using var conn = new Npgsql.NpgsqlConnection(connString);
 

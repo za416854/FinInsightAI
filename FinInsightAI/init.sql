@@ -12,5 +12,5 @@ INSERT INTO loans (customer_name, amount, status, loan_date)
 VALUES
     ('張小明', 500000, 'Approved', '2024-03-01'),
     ('李阿花', 1200000, 'Pending', '2024-03-15'),
-    ('王大同', 800000, 'Approved', '2024-03-20'),
+    ('王大同', 800000, 'Approved', '2024-03-20');
     ('李奕辰', 813545, 'Approved', '2024-03-20');
