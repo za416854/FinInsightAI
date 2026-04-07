@@ -130,10 +130,43 @@ Example Response:
 }
 
 🧠 Key Logic: The Agentic Loop
-The project follows a 3-step AI logic within the /ask endpoint:
+- The project follows a 3-step AI logic within the /ask endpoint: 
+- Generation: Gemini receives the database schema and the user's question to generate a valid PostgreSQL query. 
+- Execution: The system uses Dapper to execute the raw SQL against the Postgres container safely. 
+- Summarization: The raw JSON data result is sent back to Gemini to be transformed into a professional, human-readable insight.
 
-Generation: Gemini receives the database schema and the user's question to generate a valid PostgreSQL query.
 
-Execution: The system uses Dapper to execute the raw SQL against the Postgres container safely.
+Subsequent Cloud Deployment Four Steps:
+1. Local End: Packaging and Pushing (Build & Push)
+Source: Docker grabs the code and Dockerfile from your local computer folder. 
+- Action: You run docker build on your computer, packaging the code into an Image. 
+- Transfer: You run docker push to send this Image to AWS ECR (cloud repository). 
+    - Note: EC2 won't directly grab files from GitHub or your computer; it picks up from the ECR repository.
 
-Summarization: The raw JSON data result is sent back to Gemini to be transformed into a professional, human-readable insight.
+2. EC2 Preparation: Authentication (Auth)
+- Login: You run aws configure on EC2 and input Access Key. 
+    - Purpose: This step is to give EC2 'entry permission' so it has the authority to pull your private Image from the ECR repository.
+- Create RDS: Launch a PostgreSQL instance in AWS Console and note the Endpoint.
+
+3. Database Initialization (Database Schema & Data)
+- Connection: Connect from local pgAdmin to cloud RDS via Endpoint. 
+- Initialization: Run init.sql to create the loans table and insert test data (Li Ahua, Zhang Xiaoming). 
+- Significance: Ensure that when the API container starts, the backend has 'fresh data' to query, avoiding 500 Error.
+
+4. Deployment: Pull and Run (Pull & Run)
+- Pickup: Run docker pull, EC2 downloads the Image you just uploaded from ECR. 
+- Start: Run docker run, this is when the container is actually created. 
+- Injection: You pass the Gemini Key and RDS Endpoint connection string via -e in the command, so the program knows how to communicate with AI and the database.
+
+5. Infrastructure: Opening Doors and Connections (Network)
+- External: Open Port 80 in Security Group so your browser can access EC2. 
+- Internal: Confirm RDS firewall allows EC2 to access Port 5432. 
+- Initialization: Run init.sql in RDS to create the loans table.
+    - Test: Visit http://EC2-IP/ask in browser, confirm AI can successfully retrieve and analyze data from RDS.
+
+Summary of AWS Achievements:
+It's not simply 'starting a computer', but completing a 'distributed architecture': 
+- Compute Layer (Compute): EC2 + Docker Container. 
+- Data Layer (Storage): AWS RDS (PostgreSQL). 
+- Intelligence Layer (AI): Google Gemini API. 
+- Repository Layer (Registry): AWS ECR.
