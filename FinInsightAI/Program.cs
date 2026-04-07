@@ -29,10 +29,10 @@ app.MapGet("/ask", async (string prompt, GeminiService gemini) =>
     var sql = rawSql.Replace("```sql", "").Replace("```", "").Trim();
 
     string connString = "Host=localhost;Port=5432;Username=myuser;Password=mypassword;Database=FinInsightDb";
-    
+
     using var conn = new Npgsql.NpgsqlConnection(connString);
-    
-    try 
+
+    try
     {
         // 使用清理後的 sql 變數
         var filteredData = (await conn.QueryAsync<LoanRecord>(sql)).ToList();
@@ -42,8 +42,8 @@ app.MapGet("/ask", async (string prompt, GeminiService gemini) =>
         return Results.Ok(new
         {
             Question = prompt,
-            Sql = sql, 
-            Data = filteredData, 
+            Sql = sql,
+            Data = filteredData,
             AIAnalysis = summary
         });
     }
@@ -64,9 +64,7 @@ app.Run();
 
 public class GeminiService
 {
-
-    // ⚠️ 建議實務上放入 appsettings.json
-
+    // ⚠️ 建議實務上放入 appsettings.json，並使用 IConfiguration 注入來讀取
     private readonly string _apiKey;
     private readonly IConfiguration _configuration; // 加入這個欄位
 
@@ -75,7 +73,7 @@ public class GeminiService
     {
         _configuration = configuration;
         // 從 appsettings.json 的 Gemini:ApiKey 路徑讀取數值
-        _apiKey = _configuration["Gemini:ApiKey"] 
+        _apiKey = _configuration["Gemini:ApiKey"]
                   ?? throw new ArgumentNullException("找不到 Gemini API Key 設定！");
     }
 
@@ -132,5 +130,5 @@ public class LoanRecord
     public string customer_name { get; init; } = string.Empty;
     public decimal amount { get; init; }
     public string status { get; init; } = string.Empty;
-    public DateOnly  loan_date { get; init; }
+    public DateOnly loan_date { get; init; }
 }
