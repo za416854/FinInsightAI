@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-
 using Mscc.GenerativeAI;
 using Microsoft.Extensions.Configuration;
 using Mscc.GenerativeAI.Types;
@@ -8,57 +7,19 @@ using Dapper; // 引用 Gemini SDK
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-
 // --- 1. 註冊服務 (Dependency Injection) ---
-
 builder.Services.AddOpenApi();
-
 // 註冊 GeminiService，這樣 Controller 或 Minimal API 就能直接使用它
-
 builder.Services.AddScoped<GeminiService>();
-
-
-
 var app = builder.Build();
-
-
-
 if (app.Environment.IsDevelopment())
-
 {
-
     app.MapOpenApi();
-
 }
 
 
-
-// app.UseHttpsRedirection();
-
-
-
-// --- 2. 模擬資料庫數據 ---
-
-// var loanDatabase = new List<LoanRecord>
-
-// {
-
-// new(1, "張小明", 500000, "Approved", "2024-03-01"),
-
-// new(2, "李阿花", 1200000, "Pending", "2024-03-15"),
-
-// new(3, "王大同", 800000, "Approved", "2024-03-20")
-
-// };
-
-
-
 // --- 3. 建立 AI 問答 Endpoint ---
-
 app.MapGet("/ask", async (string prompt, GeminiService gemini) =>
-
 {
     // 1. AI 生成 SQL
     var rawSql = await gemini.GenerateSql(prompt);
@@ -93,10 +54,7 @@ app.MapGet("/ask", async (string prompt, GeminiService gemini) =>
     }
 
 })
-
 .WithName("AskGemini");
-
-
 
 app.Run();
 
@@ -105,7 +63,6 @@ app.Run();
 // --- 4. 定義 GeminiService 類別 ---
 
 public class GeminiService
-
 {
 
     // ⚠️ 建議實務上放入 appsettings.json
@@ -133,26 +90,18 @@ public class GeminiService
 
 
     public async Task<string> GenerateSql(string userQuestion)
-
     {
-
         // 初始化 Gemini
         var googleAi = new GoogleAI(_apiKey);
         var model = googleAi.GenerativeModel(Model.Gemini25Flash); // 使用快速且免費額度高的 Flash 模型
 
-
-
         // 合併 Prompt
         var fullPrompt = $"{_schemaContext}\n使用者問題:{userQuestion}";
-
-
 
         // 呼叫 AI
         var response = await model.GenerateContent(fullPrompt);
 
-
         return response.Text ?? "無法生成 SQL";
-
     }
     public async Task<string> GenerateSummary(string question, object data)
     {
